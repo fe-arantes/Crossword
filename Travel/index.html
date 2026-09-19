@@ -23,6 +23,7 @@
     --bad-bg:#FBE4DF;
     --hint-bg:#FFF3C9;
     --cell:40px;
+    --gap:3px;
     --mono:ui-monospace,"Cascadia Mono","SF Mono",Menlo,Consolas,monospace;
     --sans:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
   }
@@ -143,14 +144,18 @@
     border-radius:14px;
     padding:16px 10px;
     position:relative;
+    min-width:0;max-width:100%;
     box-shadow:0 2px 10px rgba(22,50,79,.08);
   }
-  .board-scroll{overflow-x:auto;padding:6px 2px;-webkit-overflow-scrolling:touch}
+  .board-scroll{
+    overflow-x:auto;max-width:100%;padding:6px 2px;
+    -webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;
+  }
   #grid{
     display:grid;
     grid-template-columns:repeat(18,var(--cell));
     grid-auto-rows:var(--cell);
-    gap:3px;
+    gap:var(--gap);
     width:max-content;
     margin:0 auto;
   }
@@ -168,6 +173,7 @@
     text-transform:uppercase;
     caret-color:var(--accent);
     padding:0;
+    scroll-margin:10px;
     transition:background .15s,border-color .15s;
   }
   .cell input:focus{outline:none}
@@ -249,6 +255,38 @@
     color:var(--ink-soft);text-transform:uppercase;
   }
 
+  /* ---------- Barra de pista (telas pequenas) ---------- */
+  #clueBar{
+    display:none;align-items:center;gap:9px;
+    position:sticky;top:6px;z-index:30;
+    margin:0 0 10px;padding:9px 10px;border-radius:12px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    box-shadow:0 5px 18px rgba(22,50,79,.16);
+  }
+  .cb-body{flex:1 1 auto;min-width:0}
+  .cb-top{display:flex;align-items:center;gap:6px}
+  .cb-dir{
+    font-family:var(--mono);font-size:.58rem;font-weight:700;
+    letter-spacing:.14em;text-transform:uppercase;
+    color:var(--accent);background:var(--hl);
+    border:0;border-radius:999px;padding:3px 9px;cursor:pointer;
+  }
+  .cb-num{font-weight:800;font-size:.95rem;color:var(--accent)}
+  #clueBar.solved .cb-num::after{content:" ✔";color:var(--ok)}
+  .cb-text{
+    font-size:.86rem;line-height:1.35;margin-top:2px;color:var(--ink);
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  #clueBar.solved .cb-text{color:var(--ink-soft)}
+  .cb-nav{
+    flex:0 0 34px;height:34px;padding:0;
+    border:1px solid var(--line);border-radius:50%;
+    background:var(--paper);color:var(--accent);
+    font-size:1.15rem;line-height:1;cursor:pointer;
+  }
+  .cb-nav:active{background:var(--hl)}
+
   /* ---------- Modal de confirmação ---------- */
   #modalOverlay{
     position:fixed;inset:0;z-index:50;
@@ -271,10 +309,17 @@
   .modal p{font-size:1rem;line-height:1.45;margin-bottom:16px}
   .modal-actions{display:flex;gap:8px;justify-content:flex-end}
 
-  @media (max-width:700px){
-    :root{--cell:34px}
+  @media (max-width:760px){
+    html{scroll-padding-top:104px}
+    body{padding:12px 10px 40px}
     .clues{grid-template-columns:1fr}
-    .toolbar{position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 0}
+    .toolbar{position:static;gap:6px;margin:14px 0 4px}
+    .btn{font-size:.78rem;padding:9px 11px}
+    #clueBar{display:flex}
+    .ticket-main{padding:16px 14px 14px}
+    .board-shell{padding:10px 5px}
+    .board-scroll{padding:4px 1px}
+    #status{margin:6px 2px 8px;font-size:.86rem}
   }
   @media (prefers-reduced-motion:reduce){
     *{animation:none!important;transition:none!important}
@@ -312,6 +357,18 @@
     <button class="btn danger" id="clearBtn" type="button">🗑 Clear all</button>
   </div>
   <p id="status">Click a square and type. Click the same square again to switch between across ↔ down.</p>
+
+  <div id="clueBar" aria-live="polite">
+    <button class="cb-nav" id="cbPrev" type="button" aria-label="Previous clue">&#8249;</button>
+    <div class="cb-body">
+      <div class="cb-top">
+        <button class="cb-dir" id="cbDir" type="button" aria-label="Switch between across and down">Across</button>
+        <span class="cb-num" id="cbNum"></span>
+      </div>
+      <div class="cb-text" id="cbText">Tap a square to see its clue.</div>
+    </div>
+    <button class="cb-nav" id="cbNext" type="button" aria-label="Next clue">&#8250;</button>
+  </div>
 
   <div class="board-shell">
     <div class="board-scroll">
@@ -472,6 +529,7 @@
       if (li) li.classList.add("current");
     }
     cell.el.classList.add("active");
+    updateClueBar();
   }
 
   function toggleDir(k){
@@ -480,6 +538,53 @@
       selectCell(k, otherDir(dir));
     }
   }
+
+  /* ---------------- Barra de pista (no celular as listas ficam longe da grade) ---------------- */
+  function isSolved(idx){
+    return wordCells(idx).every(function(k){ return cells[k].input.value === cells[k].ans; });
+  }
+
+  function goTo(idx){
+    var w = WORDS[idx];
+    selectCell(key(w.r, w.c), w.d);
+    cells[key(w.r, w.c)].input.focus();
+  }
+
+  var CB = {
+    box:  document.getElementById("clueBar"),
+    dir:  document.getElementById("cbDir"),
+    num:  document.getElementById("cbNum"),
+    text: document.getElementById("cbText")
+  };
+
+  function updateClueBar(){
+    var idx = activeKey ? cells[activeKey].words[dir] : undefined;
+    if (idx === undefined){
+      CB.box.classList.remove("solved");
+      CB.dir.textContent = "Clue";
+      CB.num.textContent = "";
+      CB.text.textContent = "Tap a square to see its clue.";
+      return;
+    }
+    var w = WORDS[idx];
+    CB.box.classList.toggle("solved", isSolved(idx));
+    CB.dir.textContent = (dir === "A" ? "Across" : "Down");
+    CB.num.textContent = w.n + ".";
+    CB.text.textContent = w.clue;
+  }
+
+  function stepWord(delta){
+    var cur = activeKey ? cells[activeKey].words[dir] : undefined;
+    var next = (cur === undefined)
+      ? (delta > 0 ? 0 : WORDS.length - 1)
+      : (cur + delta + WORDS.length) % WORDS.length;
+    goTo(next);
+  }
+  document.getElementById("cbPrev").addEventListener("click", function(){ stepWord(-1); });
+  document.getElementById("cbNext").addEventListener("click", function(){ stepWord(1); });
+  CB.dir.addEventListener("click", function(){
+    if (activeKey){ toggleDir(activeKey); cells[activeKey].input.focus(); }
+  });
 
   /* ---------------- Navegação ---------------- */
   function moveWithinWord(step){
@@ -568,6 +673,7 @@
       var li = document.querySelector('.clue-box li[data-idx="' + idx + '"]');
       if (li) li.classList.toggle("done", done);
     });
+    updateClueBar();
   }
 
   function checkComplete(){
@@ -695,6 +801,44 @@
     var cur = document.documentElement.getAttribute("data-theme");
     applyTheme(cur === "dark" ? "light" : "dark");
   });
+
+  /* ---------------- Tamanho das casas ----------------
+     Medido pela viewport, nunca pelo container: o container é esticado pela
+     própria grade, então medi-lo faria a conta nunca encolher. Com 18 colunas
+     a grade ainda passa da largura de um celular, mas a rolagem fica presa
+     dentro do tabuleiro — a página em si não anda de lado. */
+  function fitGrid(){
+    var vw = document.documentElement.clientWidth;
+    var phone = vw <= 760;
+
+    var gap = phone ? 2 : 3;
+    document.documentElement.style.setProperty("--gap", gap + "px");
+
+    var shell = document.querySelector(".board-shell");
+    var scroll = document.querySelector(".board-scroll");
+    if (!shell || !scroll) return;
+    var cs = getComputedStyle(shell), cr = getComputedStyle(scroll);
+    var chrome = parseFloat(cs.paddingLeft) + parseFloat(cs.paddingRight)
+               + parseFloat(cs.borderLeftWidth) + parseFloat(cs.borderRightWidth)
+               + parseFloat(cr.paddingLeft) + parseFloat(cr.paddingRight);
+
+    var bodyPad = parseFloat(getComputedStyle(document.body).paddingLeft) * 2;
+    var disp = Math.min(vw - bodyPad, 980) - chrome;
+
+    var min = phone ? 20 : 26;
+    var tam = Math.floor((disp - (COLS - 1) * gap) / COLS);
+    tam = Math.max(min, Math.min(40, tam));
+    document.documentElement.style.setProperty("--cell", tam + "px");
+
+    for (var i = 0; i < 6 && tam > min && scroll.scrollWidth > scroll.clientWidth; i++){
+      tam--;
+      document.documentElement.style.setProperty("--cell", tam + "px");
+    }
+  }
+  window.addEventListener("resize", fitGrid);
+  window.addEventListener("orientationchange", fitGrid);
+  window.addEventListener("load", fitGrid);
+  requestAnimationFrame(fitGrid);
 
   updateProgress();
 })();
