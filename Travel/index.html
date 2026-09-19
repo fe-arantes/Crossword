@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Travel Crossword — English Crossword Puzzle</title>
+<style>
+  :root{
+    --bg:#EDF3F9;
+    --paper:#FFFFFF;
+    --ink:#16324F;
+    --ink-soft:#51708C;
+    --line:#C9D6E2;
+    --cell-bg:#FFFFFF;
+    --cell-border:#9FB4C8;
+    --hl:#D8EAFB;
+    --hl-active:#AFD4F5;
+    --accent:#1D5C96;
+    --stamp:#B3402F;
+    --ok:#1E7A46;
+    --ok-bg:#E2F3E8;
+    --bad:#B3402F;
+    --bad-bg:#FBE4DF;
+    --hint-bg:#FFF3C9;
+    --cell:40px;
+    --mono:ui-monospace,"Cascadia Mono","SF Mono",Menlo,Consolas,monospace;
+    --sans:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+  [data-theme="dark"]{
+    --bg:#0E1A25;
+    --paper:#16242F;
+    --ink:#E8EEF4;
+    --ink-soft:#9DB2C4;
+    --line:#2C4157;
+    --cell-bg:#1D2F3D;
+    --cell-border:#3C566E;
+    --hl:#24405C;
+    --hl-active:#2F5B85;
+    --accent:#7FB8E8;
+    --stamp:#E06A55;
+    --ok:#5FCB8B;
+    --ok-bg:#1C3A2A;
+    --bad:#F08A76;
+    --bad-bg:#45231D;
+    --hint-bg:#4A3D14;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    min-height:100vh;
+    padding:16px 12px 48px;
+    transition:background .3s,color .3s;
+  }
+  .wrap{max-width:980px;margin:0 auto}
+
+  /* ---------- Cabeçalho estilo cartão de embarque ---------- */
+  .ticket{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow:0 2px 10px rgba(22,50,79,.08);
+  }
+  .ticket-top{
+    display:flex;justify-content:space-between;align-items:center;
+    padding:10px 18px;
+    background:var(--ink);
+    color:var(--paper);
+  }
+  [data-theme="dark"] .ticket-top{background:#0A121A;color:var(--ink)}
+  .ticket-top .airline{
+    font-family:var(--mono);
+    font-size:.72rem;letter-spacing:.18em;text-transform:uppercase;
+  }
+  #themeBtn{
+    background:transparent;border:1px solid currentColor;color:inherit;
+    border-radius:20px;padding:4px 12px;font-size:.75rem;cursor:pointer;
+    font-family:var(--mono);
+  }
+  .ticket-main{
+    padding:20px 18px 16px;
+    border-bottom:2px dashed var(--line);
+    position:relative;
+  }
+  .ticket-main::before,.ticket-main::after{
+    content:"";position:absolute;bottom:-11px;width:20px;height:20px;
+    border-radius:50%;background:var(--bg);border:1px solid var(--line);
+  }
+  .ticket-main::before{left:-11px}
+  .ticket-main::after{right:-11px}
+  h1{
+    font-size:clamp(1.5rem,4.5vw,2.2rem);
+    letter-spacing:.02em;font-weight:800;
+  }
+  .route{
+    margin-top:6px;
+    font-family:var(--mono);
+    font-size:.8rem;letter-spacing:.14em;
+    color:var(--ink-soft);text-transform:uppercase;
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+  }
+  .route .dots{flex:0 1 90px;border-top:2px dotted var(--ink-soft);min-width:40px}
+  .ticket-foot{
+    display:flex;justify-content:space-between;align-items:center;gap:10px;
+    padding:10px 18px;
+    font-family:var(--mono);font-size:.72rem;letter-spacing:.1em;
+    color:var(--ink-soft);text-transform:uppercase;flex-wrap:wrap;
+  }
+
+  /* ---------- Botões ---------- */
+  .toolbar{
+    display:flex;gap:8px;flex-wrap:wrap;
+    margin:18px 0 6px;
+  }
+  .btn{
+    font-family:var(--sans);
+    font-size:.88rem;font-weight:600;
+    padding:9px 14px;border-radius:10px;cursor:pointer;
+    border:1px solid var(--line);
+    background:var(--paper);color:var(--ink);
+    transition:transform .06s,background .2s;
+  }
+  .btn:hover{background:var(--hl)}
+  .btn:active{transform:scale(.97)}
+  .btn:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+  .btn.primary{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+  [data-theme="dark"] .btn.primary{background:var(--accent);color:#0E1A25;border-color:var(--accent)}
+  .btn.danger{color:var(--bad)}
+  #status{
+    min-height:1.4em;
+    margin:6px 2px 10px;
+    font-size:.9rem;color:var(--ink-soft);
+  }
+  #status strong{color:var(--ink)}
+
+  /* ---------- Grade ---------- */
+  .board-shell{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px 10px;
+    position:relative;
+    box-shadow:0 2px 10px rgba(22,50,79,.08);
+  }
+  .board-scroll{overflow-x:auto;padding:6px 2px;-webkit-overflow-scrolling:touch}
+  #grid{
+    display:grid;
+    grid-template-columns:repeat(18,var(--cell));
+    grid-auto-rows:var(--cell);
+    gap:3px;
+    width:max-content;
+    margin:0 auto;
+  }
+  .cell{position:relative}
+  .cell input{
+    width:100%;height:100%;
+    border:1.5px solid var(--cell-border);
+    border-radius:6px;
+    background:var(--cell-bg);
+    color:var(--ink);
+    text-align:center;
+    font-family:var(--sans);
+    font-size:max(16px,calc(var(--cell) * .46));
+    font-weight:700;
+    text-transform:uppercase;
+    caret-color:var(--accent);
+    padding:0;
+    transition:background .15s,border-color .15s;
+  }
+  .cell input:focus{outline:none}
+  .cell .num{
+    position:absolute;top:2px;left:4px;
+    font-size:calc(var(--cell) * .26);
+    font-weight:700;color:var(--ink-soft);
+    pointer-events:none;line-height:1;
+  }
+  .cell.word input{background:var(--hl)}
+  .cell.active input{background:var(--hl-active);border-color:var(--accent)}
+  .cell.ok input{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
+  .cell.bad input{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
+  .cell.hinted input{background:var(--hint-bg);border-color:#C9A227}
+  .blank{visibility:hidden}
+
+  /* ---------- Carimbo de conclusão ---------- */
+  #stamp{
+    position:absolute;inset:0;
+    display:flex;align-items:center;justify-content:center;
+    pointer-events:none;opacity:0;
+  }
+  #stamp.show{opacity:1}
+  #stamp .seal{
+    font-family:var(--mono);
+    text-transform:uppercase;letter-spacing:.2em;
+    color:var(--stamp);
+    border:4px double var(--stamp);
+    border-radius:10px;
+    padding:14px 26px;
+    font-size:clamp(.9rem,3.4vw,1.4rem);
+    font-weight:700;
+    transform:rotate(-10deg) scale(1);
+    background:color-mix(in srgb,var(--paper) 82%,transparent);
+    box-shadow:0 4px 18px rgba(0,0,0,.18);
+    text-align:center;
+  }
+  #stamp.show .seal{animation:stampIn .45s cubic-bezier(.2,1.6,.4,1)}
+  @keyframes stampIn{
+    0%{transform:rotate(-10deg) scale(2.1);opacity:0}
+    100%{transform:rotate(-10deg) scale(1);opacity:1}
+  }
+
+  /* ---------- Dicas / pistas ---------- */
+  .clues{
+    display:grid;grid-template-columns:1fr 1fr;gap:14px;
+    margin-top:18px;
+  }
+  .clue-box{
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:16px 18px;
+  }
+  .clue-box h2{
+    font-size:.85rem;letter-spacing:.16em;text-transform:uppercase;
+    font-family:var(--mono);
+    color:var(--ink-soft);
+    margin-bottom:10px;
+    border-bottom:1px solid var(--line);
+    padding-bottom:8px;
+  }
+  .clue-box ol{list-style:none}
+  .clue-box li{
+    padding:7px 8px;margin:2px 0;
+    border-radius:8px;
+    font-size:.92rem;line-height:1.4;
+    cursor:pointer;
+    display:flex;gap:8px;
+    transition:background .15s;
+  }
+  .clue-box li:hover{background:var(--hl)}
+  .clue-box li.current{background:var(--hl-active)}
+  .clue-box li.done{color:var(--ink-soft);text-decoration:line-through}
+  .clue-box li .cnum{font-weight:800;min-width:1.4em;color:var(--accent)}
+  footer{
+    margin-top:22px;text-align:center;
+    font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;
+    color:var(--ink-soft);text-transform:uppercase;
+  }
+
+  /* ---------- Modal de confirmação ---------- */
+  #modalOverlay{
+    position:fixed;inset:0;z-index:50;
+    background:rgba(10,20,30,.55);
+    display:none;align-items:center;justify-content:center;
+    padding:20px;
+  }
+  #modalOverlay.show{display:flex}
+  .modal{
+    background:var(--paper);
+    color:var(--ink);
+    border:1px solid var(--line);
+    border-radius:14px;
+    padding:22px 20px 18px;
+    max-width:340px;width:100%;
+    box-shadow:0 10px 40px rgba(0,0,0,.35);
+    animation:modalIn .18s ease-out;
+  }
+  @keyframes modalIn{from{transform:scale(.92);opacity:0}to{transform:scale(1);opacity:1}}
+  .modal p{font-size:1rem;line-height:1.45;margin-bottom:16px}
+  .modal-actions{display:flex;gap:8px;justify-content:flex-end}
+
+  @media (max-width:700px){
+    :root{--cell:34px}
+    .clues{grid-template-columns:1fr}
+    .toolbar{position:sticky;top:0;z-index:5;background:var(--bg);padding:8px 0}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="ticket">
+    <div class="ticket-top">
+      <span class="airline">✈ English Practice Airlines</span>
+      <button id="themeBtn" type="button" aria-label="Toggle theme">◐ Theme</button>
+    </div>
+    <div class="ticket-main">
+      <h1>Travel Crossword</h1>
+      <div class="route">
+        <span>Crossword Puzzle · English</span>
+        <span class="dots" aria-hidden="true"></span>
+        <span>Theme: Travel</span>
+        <span class="dots" aria-hidden="true"></span>
+        <span>10 words</span>
+      </div>
+    </div>
+    <div class="ticket-foot">
+      <span>Boarding pass · Seat 4A</span>
+      <span id="progress">0 / 50 letters</span>
+    </div>
+  </header>
+
+  <div class="toolbar">
+    <button class="btn primary" id="hintBtn" type="button">💡 Hint</button>
+    <button class="btn" id="checkBtn" type="button">✔ Check</button>
+    <button class="btn" id="revealBtn" type="button">👁 Show answers</button>
+    <button class="btn danger" id="clearBtn" type="button">🗑 Clear all</button>
+  </div>
+  <p id="status">Click a square and type. Click the same square again to switch between across ↔ down.</p>
+
+  <div class="board-shell">
+    <div class="board-scroll">
+      <div id="grid" aria-label="Crossword grid"></div>
+    </div>
+    <div id="stamp" aria-hidden="true"><div class="seal">✈ Trip Complete!<br>Well done</div></div>
+  </div>
+
+  <div class="clues">
+    <div class="clue-box">
+      <h2>→ Across</h2>
+      <ol id="acrossList"></ol>
+    </div>
+    <div class="clue-box">
+      <h2>↓ Down</h2>
+      <ol id="downList"></ol>
+    </div>
+  </div>
+
+  <footer>Have a nice trip! ✈</footer>
+</div>
+
+<div id="modalOverlay" role="dialog" aria-modal="true" aria-labelledby="modalMsg">
+  <div class="modal">
+    <p id="modalMsg"></p>
+    <div class="modal-actions">
+      <button class="btn" id="modalCancel" type="button">Cancel</button>
+      <button class="btn primary" id="modalOk" type="button">Yes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ---------------- Dados do jogo ---------------- */
+  var WORDS = [
+    {n:1,  w:"PLANE",    r:0, c:4,  d:"A", clue:"A vehicle that flies in the sky."},
+    {n:2,  w:"AIRPORT",  r:0, c:6,  d:"D", clue:"The place where planes take off and land."},
+    {n:3,  w:"TAXI",     r:2, c:3,  d:"D", clue:"A car you pay to drive you somewhere."},
+    {n:4,  w:"TOURIST",  r:2, c:14, d:"D", clue:"A person who travels for pleasure."},
+    {n:5,  w:"PASSPORT", r:3, c:2,  d:"A", clue:"The official document you need to enter another country."},
+    {n:6,  w:"TICKET",   r:3, c:9,  d:"D", clue:"You buy this to board a plane, train or bus."},
+    {n:7,  w:"HOTEL",    r:3, c:13, d:"A", clue:"A place where travelers sleep."},
+    {n:8,  w:"TRAIN",    r:5, c:0,  d:"A", clue:"A long vehicle that runs on rails."},
+    {n:9,  w:"COUNTRY",  r:5, c:9,  d:"A", clue:"Brazil, Japan and France are examples of this."},
+    {n:10, w:"BEACH",    r:7, c:8,  d:"A", clue:"A sandy place by the sea, perfect for sunny days."}
+  ];
+  var ROWS = 9, COLS = 18;
+
+  /* ---------------- Montagem do mapa de células ---------------- */
+  var cells = {}; // "r-c" -> {ans, r, c, words:{A:idx,D:idx}, num, input, el}
+  function key(r,c){ return r + "-" + c; }
+
+  WORDS.forEach(function(word, idx){
+    for (var i = 0; i < word.w.length; i++){
+      var r = word.r + (word.d === "D" ? i : 0);
+      var c = word.c + (word.d === "A" ? i : 0);
+      var k = key(r,c);
+      if (!cells[k]) cells[k] = {ans:"", r:r, c:c, words:{}, num:null};
+      cells[k].ans = word.w[i];
+      cells[k].words[word.d] = idx;
+      if (i === 0) cells[k].num = word.n;
+    }
+  });
+
+  function wordCells(idx){
+    var w = WORDS[idx], list = [];
+    for (var i = 0; i < w.w.length; i++){
+      list.push(key(w.r + (w.d === "D" ? i : 0), w.c + (w.d === "A" ? i : 0)));
+    }
+    return list;
+  }
+
+  var TOTAL = Object.keys(cells).length;
+
+  /* ---------------- Renderização da grade ---------------- */
+  var grid = document.getElementById("grid");
+  for (var r = 0; r < ROWS; r++){
+    for (var c = 0; c < COLS; c++){
+      var k = key(r,c);
+      if (cells[k]){
+        var div = document.createElement("div");
+        div.className = "cell";
+        var input = document.createElement("input");
+        input.type = "text";
+        input.maxLength = 2; /* permite substituição; JS mantém 1 letra */
+        input.autocomplete = "off";
+        input.autocapitalize = "characters";
+        input.spellcheck = false;
+        input.inputMode = "text";
+        input.setAttribute("data-k", k);
+        input.setAttribute("aria-label", "Row " + (r+1) + ", column " + (c+1));
+        div.appendChild(input);
+        if (cells[k].num){
+          var num = document.createElement("span");
+          num.className = "num";
+          num.textContent = cells[k].num;
+          div.appendChild(num);
+        }
+        cells[k].input = input;
+        cells[k].el = div;
+        grid.appendChild(div);
+      } else {
+        var blank = document.createElement("div");
+        blank.className = "blank";
+        grid.appendChild(blank);
+      }
+    }
+  }
+
+  /* ---------------- Listas de pistas ---------------- */
+  var acrossList = document.getElementById("acrossList");
+  var downList   = document.getElementById("downList");
+  WORDS.forEach(function(w, idx){
+    var li = document.createElement("li");
+    li.setAttribute("data-idx", idx);
+    li.innerHTML = '<span class="cnum">' + w.n + '.</span><span>' + w.clue + '</span>';
+    li.addEventListener("click", function(){
+      selectCell(key(w.r, w.c), w.d);
+      cells[key(w.r, w.c)].input.focus({preventScroll:false});
+    });
+    (w.d === "A" ? acrossList : downList).appendChild(li);
+  });
+
+  /* ---------------- Estado / seleção ---------------- */
+  var dir = "A";
+  var activeKey = null;
+  var statusEl = document.getElementById("status");
+  var progressEl = document.getElementById("progress");
+  var stampEl = document.getElementById("stamp");
+  var completed = false;
+
+  function otherDir(d){ return d === "A" ? "D" : "A"; }
+
+  function clearHighlights(){
+    Object.keys(cells).forEach(function(k){
+      cells[k].el.classList.remove("word","active");
+    });
+    document.querySelectorAll(".clue-box li").forEach(function(li){
+      li.classList.remove("current");
+    });
+  }
+
+  function selectCell(k, wantDir){
+    var cell = cells[k];
+    if (!cell) return;
+    var d = wantDir || dir;
+    if (cell.words[d] === undefined) d = otherDir(d);
+    dir = d;
+    activeKey = k;
+    clearHighlights();
+    var idx = cell.words[dir];
+    if (idx !== undefined){
+      wordCells(idx).forEach(function(wk){ cells[wk].el.classList.add("word"); });
+      var li = document.querySelector('.clue-box li[data-idx="' + idx + '"]');
+      if (li) li.classList.add("current");
+    }
+    cell.el.classList.add("active");
+  }
+
+  function toggleDir(k){
+    var cell = cells[k];
+    if (cell.words.A !== undefined && cell.words.D !== undefined){
+      selectCell(k, otherDir(dir));
+    }
+  }
+
+  /* ---------------- Navegação ---------------- */
+  function moveWithinWord(step){
+    if (!activeKey) return;
+    var cell = cells[activeKey];
+    var idx = cell.words[dir];
+    if (idx === undefined) return;
+    var list = wordCells(idx);
+    var pos = list.indexOf(activeKey);
+    var nk = list[pos + step];
+    if (nk){
+      selectCell(nk, dir);
+      cells[nk].input.focus();
+      return cells[nk];
+    }
+    return null;
+  }
+
+  function moveArrow(dr, dc){
+    if (!activeKey) return;
+    var cell = cells[activeKey];
+    var nk = key(cell.r + dr, cell.c + dc);
+    if (cells[nk]){
+      var want = (dr !== 0) ? "D" : "A";
+      selectCell(nk, cells[nk].words[want] !== undefined ? want : otherDir(want));
+      cells[nk].input.focus();
+    }
+  }
+
+  /* ---------------- Eventos das células ---------------- */
+  Object.keys(cells).forEach(function(k){
+    var input = cells[k].input;
+
+    input.addEventListener("focus", function(){
+      if (activeKey !== k) selectCell(k);
+    });
+
+    input.addEventListener("click", function(){
+      if (activeKey === k) toggleDir(k);
+      else selectCell(k);
+    });
+
+    input.addEventListener("input", function(){
+      var v = input.value.replace(/[^a-zA-Z]/g, "").toUpperCase();
+      input.value = v.slice(-1);
+      cells[k].el.classList.remove("ok","bad","hinted");
+      if (input.value){
+        moveWithinWord(1);
+      }
+      updateProgress();
+      checkComplete();
+    });
+
+    input.addEventListener("keydown", function(e){
+      if (e.key === "Backspace"){
+        if (input.value === ""){
+          e.preventDefault();
+          var prev = moveWithinWord(-1);
+          if (prev){
+            prev.input.value = "";
+            prev.el.classList.remove("ok","bad","hinted");
+            updateProgress();
+          }
+        } else {
+          cells[k].el.classList.remove("ok","bad","hinted");
+        }
+      }
+      else if (e.key === "ArrowRight"){ e.preventDefault(); moveArrow(0, 1); }
+      else if (e.key === "ArrowLeft") { e.preventDefault(); moveArrow(0,-1); }
+      else if (e.key === "ArrowDown") { e.preventDefault(); moveArrow(1, 0); }
+      else if (e.key === "ArrowUp")   { e.preventDefault(); moveArrow(-1,0); }
+    });
+  });
+
+  /* ---------------- Progresso / conclusão ---------------- */
+  function updateProgress(){
+    var filled = 0;
+    Object.keys(cells).forEach(function(k){ if (cells[k].input.value) filled++; });
+    progressEl.textContent = filled + " / " + TOTAL + " letters";
+    markDoneClues();
+  }
+
+  function markDoneClues(){
+    WORDS.forEach(function(w, idx){
+      var done = wordCells(idx).every(function(k){ return cells[k].input.value === cells[k].ans; });
+      var li = document.querySelector('.clue-box li[data-idx="' + idx + '"]');
+      if (li) li.classList.toggle("done", done);
+    });
+  }
+
+  function checkComplete(){
+    var all = Object.keys(cells).every(function(k){ return cells[k].input.value === cells[k].ans; });
+    if (all && !completed){
+      completed = true;
+      stampEl.classList.add("show");
+      setStatus("🎉 <strong>Congratulations!</strong> You completed all 10 words. Have a nice trip!");
+    } else if (!all && completed){
+      completed = false;
+      stampEl.classList.remove("show");
+    }
+  }
+
+  function setStatus(html){ statusEl.innerHTML = html; }
+
+  /* ---------------- Confirmação customizada (confirm() nativo é bloqueado em alguns visualizadores) ---------------- */
+  var modalOverlay = document.getElementById("modalOverlay");
+  var modalMsg = document.getElementById("modalMsg");
+  var modalOk = document.getElementById("modalOk");
+  var modalCancel = document.getElementById("modalCancel");
+  var modalCallback = null;
+
+  function askConfirm(message, onYes){
+    modalMsg.textContent = message;
+    modalCallback = onYes;
+    modalOverlay.classList.add("show");
+    modalOk.focus();
+  }
+  function closeModal(){
+    modalOverlay.classList.remove("show");
+    modalCallback = null;
+  }
+  modalOk.addEventListener("click", function(){
+    var cb = modalCallback;
+    closeModal();
+    if (cb) cb();
+  });
+  modalCancel.addEventListener("click", closeModal);
+  modalOverlay.addEventListener("click", function(e){
+    if (e.target === modalOverlay) closeModal();
+  });
+  document.addEventListener("keydown", function(e){
+    if (e.key === "Escape" && modalOverlay.classList.contains("show")) closeModal();
+  });
+
+  /* ---------------- Botões ---------------- */
+  document.getElementById("hintBtn").addEventListener("click", function(){
+    var targets = [];
+    // Prioriza a palavra ativa
+    if (activeKey){
+      var idx = cells[activeKey].words[dir];
+      if (idx !== undefined){
+        targets = wordCells(idx).filter(function(k){ return cells[k].input.value !== cells[k].ans; });
+      }
+    }
+    // Senão, qualquer célula errada/vazia da grade
+    if (targets.length === 0){
+      targets = Object.keys(cells).filter(function(k){ return cells[k].input.value !== cells[k].ans; });
+    }
+    if (targets.length === 0){
+      setStatus("Everything is correct — no hint needed! 🎉");
+      return;
+    }
+    var k = targets[Math.floor(Math.random() * targets.length)];
+    var cell = cells[k];
+    cell.input.value = cell.ans;
+    cell.el.classList.remove("ok","bad");
+    cell.el.classList.add("hinted");
+    setTimeout(function(){ cell.el.classList.remove("hinted"); }, 1500);
+    setStatus('💡 Hint: the letter <strong>' + cell.ans + '</strong> was revealed.');
+    updateProgress();
+    checkComplete();
+  });
+
+  document.getElementById("checkBtn").addEventListener("click", function(){
+    var right = 0, wrong = 0, empty = 0;
+    Object.keys(cells).forEach(function(k){
+      var cell = cells[k];
+      cell.el.classList.remove("ok","bad");
+      if (!cell.input.value){ empty++; return; }
+      if (cell.input.value === cell.ans){ cell.el.classList.add("ok"); right++; }
+      else { cell.el.classList.add("bad"); wrong++; }
+    });
+    setStatus("✔ <strong>" + right + "</strong> correct · ✘ <strong>" + wrong + "</strong> wrong · " + empty + " blank.");
+  });
+
+  document.getElementById("revealBtn").addEventListener("click", function(){
+    askConfirm("Show all the answers?", function(){
+      Object.keys(cells).forEach(function(k){
+        var cell = cells[k];
+        cell.input.value = cell.ans;
+        cell.el.classList.remove("ok","bad","hinted");
+      });
+      setStatus("👁 Answers revealed. Use “Clear all” to try again.");
+      updateProgress();
+      checkComplete();
+    });
+  });
+
+  document.getElementById("clearBtn").addEventListener("click", function(){
+    askConfirm("Erase everything and start over?", function(){
+      Object.keys(cells).forEach(function(k){
+        var cell = cells[k];
+        cell.input.value = "";
+        cell.el.classList.remove("ok","bad","hinted");
+      });
+      completed = false;
+      stampEl.classList.remove("show");
+      clearHighlights();
+      activeKey = null;
+      setStatus("Grid cleared. Good luck! ✈");
+      updateProgress();
+    });
+  });
+
+  /* ---------------- Tema claro/escuro ---------------- */
+  var themeBtn = document.getElementById("themeBtn");
+  function applyTheme(t){
+    document.documentElement.setAttribute("data-theme", t);
+  }
+  var startTheme = (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) ? "dark" : "light";
+  applyTheme(startTheme);
+  themeBtn.addEventListener("click", function(){
+    var cur = document.documentElement.getAttribute("data-theme");
+    applyTheme(cur === "dark" ? "light" : "dark");
+  });
+
+  updateProgress();
+})();
+</script>
+</body>
+</html>
