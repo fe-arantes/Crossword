@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="English crossword puzzles you can play right in the browser — pick a theme and start.">
+<title>Crossword — English Puzzles</title>
+<style>
+  :root{
+    --bg:#F4F1EA;
+    --bg-tint:rgba(29,92,150,.07);
+    --paper:#FFFFFF;
+    --ink:#2B2E33;
+    --ink-soft:#6B7280;
+    --line:#E2DED5;
+    --shadow:0 1px 2px rgba(43,46,51,.05), 0 8px 24px rgba(43,46,51,.07);
+    --shadow-lift:0 2px 4px rgba(43,46,51,.06), 0 16px 36px rgba(43,46,51,.13);
+    --serif:"Georgia","Iowan Old Style","Times New Roman",serif;
+    --sans:"Segoe UI",system-ui,-apple-system,Roboto,"Helvetica Neue",Arial,sans-serif;
+  }
+  @media (prefers-color-scheme:dark){
+    :root{
+      --bg:#14161A;
+      --bg-tint:rgba(127,184,232,.06);
+      --paper:#1E2127;
+      --ink:#E9EBEE;
+      --ink-soft:#9BA3AF;
+      --line:#31353D;
+      --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
+      --shadow-lift:0 2px 4px rgba(0,0,0,.45), 0 16px 36px rgba(0,0,0,.5);
+    }
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    min-height:100vh;
+    background:
+      radial-gradient(760px 420px at 80% -10%, var(--bg-tint) 0%, transparent 65%),
+      var(--bg);
+    color:var(--ink);
+    font-family:var(--sans);
+    padding:clamp(28px,7vw,72px) 20px 48px;
+    display:flex;justify-content:center;
+  }
+  .wrap{width:100%;max-width:780px}
+
+  header{text-align:center;margin-bottom:clamp(28px,6vw,44px)}
+  .eyebrow{
+    font-size:.7rem;letter-spacing:.24em;text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  h1{
+    font-family:var(--serif);
+    font-size:clamp(2rem,7vw,3rem);
+    font-weight:700;letter-spacing:-.01em;line-height:1.08;
+    margin-top:10px;
+  }
+  .sub{
+    margin:14px auto 0;max-width:34em;
+    font-size:clamp(.95rem,2.6vw,1.05rem);line-height:1.6;
+    color:var(--ink-soft);
+  }
+
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+
+  .card{
+    display:flex;flex-direction:column;gap:14px;
+    background:var(--paper);
+    border:1px solid var(--line);
+    border-radius:18px;
+    padding:22px 22px 20px;
+    text-decoration:none;color:inherit;
+    box-shadow:var(--shadow);
+    transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease;
+  }
+  .card:hover,.card:focus-visible{
+    transform:translateY(-3px);
+    box-shadow:var(--shadow-lift);
+    border-color:color-mix(in srgb,var(--accent) 45%,var(--line));
+  }
+  .card:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+  .card:active{transform:translateY(-1px)}
+
+  .tile{
+    width:54px;height:54px;flex:0 0 auto;
+    border-radius:14px;
+    display:grid;place-items:center;
+    background:color-mix(in srgb,var(--accent) 13%,transparent);
+    color:var(--accent);
+    font-size:1.7rem;line-height:1;
+  }
+  .card h2{
+    font-family:var(--serif);
+    font-size:1.3rem;font-weight:700;letter-spacing:-.005em;
+  }
+  .card p{font-size:.93rem;line-height:1.55;color:var(--ink-soft)}
+  .foot{
+    margin-top:auto;padding-top:6px;
+    display:flex;align-items:center;justify-content:space-between;gap:10px;
+  }
+  .badge{
+    font-size:.68rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;
+    color:var(--accent);
+    background:color-mix(in srgb,var(--accent) 11%,transparent);
+    border-radius:999px;padding:5px 11px;
+  }
+  .go{
+    font-size:.85rem;font-weight:600;color:var(--accent);
+    display:inline-flex;align-items:center;gap:6px;
+  }
+  .go svg{transition:transform .18s ease}
+  .card:hover .go svg,.card:focus-visible .go svg{transform:translateX(3px)}
+
+  footer{
+    margin-top:36px;text-align:center;
+    font-size:.8rem;color:var(--ink-soft);
+  }
+  footer a{color:inherit}
+
+  @media (max-width:620px){
+    .grid{grid-template-columns:1fr}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="eyebrow">English practice</div>
+    <h1>Crossword</h1>
+    <p class="sub">Crossword puzzles you can play right here in your browser — no install, no sign-up. Pick a theme and start filling in the squares.</p>
+  </header>
+
+  <main class="grid">
+
+    <a class="card" href="Travel/" style="--accent:#1D5C96">
+      <span class="tile" aria-hidden="true">&#9992;</span>
+      <h2>Travel</h2>
+      <p>Airports, tickets and passports — the vocabulary you need on a trip.</p>
+      <div class="foot">
+        <span class="badge">10 words</span>
+        <span class="go">Play
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.8"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </div>
+    </a>
+
+    <a class="card" href="House/" style="--accent:#B06A33">
+      <span class="tile" aria-hidden="true">&#8962;</span>
+      <h2>Around the House</h2>
+      <p>Rooms, furniture and appliances — everyday words from home.</p>
+      <div class="foot">
+        <span class="badge">12 words</span>
+        <span class="go">Play
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+            <path d="M2 7h10M8 3l4 4-4 4" stroke="currentColor" stroke-width="1.8"
+                  stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </div>
+    </a>
+
+  </main>
+
+  <footer>Have fun &mdash; and good luck with the tricky ones.</footer>
+</div>
+</body>
+</html>
