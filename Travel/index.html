@@ -153,7 +153,7 @@
   }
   #grid{
     display:grid;
-    grid-template-columns:repeat(18,var(--cell));
+    grid-template-columns:repeat(14,var(--cell));
     grid-auto-rows:var(--cell);
     gap:var(--gap);
     width:max-content;
@@ -407,18 +407,18 @@
 
   /* ---------------- Dados do jogo ---------------- */
   var WORDS = [
-    {n:1,  w:"PLANE",    r:0, c:4,  d:"A", clue:"A vehicle that flies in the sky."},
-    {n:2,  w:"AIRPORT",  r:0, c:6,  d:"D", clue:"The place where planes take off and land."},
-    {n:3,  w:"TAXI",     r:2, c:3,  d:"D", clue:"A car you pay to drive you somewhere."},
-    {n:4,  w:"TOURIST",  r:2, c:14, d:"D", clue:"A person who travels for pleasure."},
-    {n:5,  w:"PASSPORT", r:3, c:2,  d:"A", clue:"The official document you need to enter another country."},
-    {n:6,  w:"TICKET",   r:3, c:9,  d:"D", clue:"You buy this to board a plane, train or bus."},
-    {n:7,  w:"HOTEL",    r:3, c:13, d:"A", clue:"A place where travelers sleep."},
-    {n:8,  w:"TRAIN",    r:5, c:0,  d:"A", clue:"A long vehicle that runs on rails."},
-    {n:9,  w:"COUNTRY",  r:5, c:9,  d:"A", clue:"Brazil, Japan and France are examples of this."},
-    {n:10, w:"BEACH",    r:7, c:8,  d:"A", clue:"A sandy place by the sea, perfect for sunny days."}
+    {n:1,  w:"COUNTRY",  r:0, c:0,  d:"D", clue:"Brazil, Japan and France are examples of this."},
+    {n:2,  w:"PASSPORT", r:0, c:4,  d:"A", clue:"The official document you need to enter another country."},
+    {n:2,  w:"PLANE",    r:0, c:4,  d:"D", clue:"A vehicle that flies in the sky."},
+    {n:3,  w:"TRAIN",    r:0, c:11, d:"D", clue:"A long vehicle that runs on rails."},
+    {n:4,  w:"BEACH",    r:1, c:2,  d:"D", clue:"A sandy place by the sea, perfect for sunny days."},
+    {n:5,  w:"HOTEL",    r:1, c:13, d:"D", clue:"A place where travelers sleep."},
+    {n:6,  w:"TOURIST",  r:3, c:7,  d:"A", clue:"A person who travels for pleasure."},
+    {n:6,  w:"TAXI",     r:3, c:7,  d:"D", clue:"A car you pay to drive you somewhere."},
+    {n:7,  w:"TICKET",   r:4, c:0,  d:"A", clue:"You buy this to board a plane, train or bus."},
+    {n:8,  w:"AIRPORT",  r:6, c:6,  d:"A", clue:"The place where planes take off and land."}
   ];
-  var ROWS = 9, COLS = 18;
+  var ROWS = 7, COLS = 14;
 
   /* ---------------- Montagem do mapa de células ---------------- */
   var cells = {}; // "r-c" -> {ans, r, c, words:{A:idx,D:idx}, num, input, el}
@@ -827,7 +827,7 @@
 
     var min = phone ? 20 : 26;
     var tam = Math.floor((disp - (COLS - 1) * gap) / COLS);
-    tam = Math.max(min, Math.min(40, tam));
+    tam = Math.max(min, Math.min(48, tam));
     document.documentElement.style.setProperty("--cell", tam + "px");
 
     for (var i = 0; i < 6 && tam > min && scroll.scrollWidth > scroll.clientWidth; i++){
