@@ -63,6 +63,12 @@
 
   .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
 
+  /* cada cartão traz seu acento em duas versões; a regra escolhe pelo tema
+     (um --accent inline venceria a media query, por isso a indireção) */
+  .card{--accent:var(--accent-lt)}
+  @media (prefers-color-scheme:dark){
+    .card{--accent:var(--accent-dk)}
+  }
   .card{
     display:flex;flex-direction:column;gap:14px;
     background:var(--paper);
@@ -136,7 +142,7 @@
 
   <main class="grid">
 
-    <a class="card" href="Travel/" style="--accent:#1D5C96">
+    <a class="card" href="Travel/" style="--accent-lt:#1A5691;--accent-dk:#7FB8E8">
       <span class="tile" aria-hidden="true">&#9992;</span>
       <h2>Travel</h2>
       <p>Airports, tickets and passports — the vocabulary you need on a trip.</p>
@@ -151,7 +157,7 @@
       </div>
     </a>
 
-    <a class="card" href="House/" style="--accent:#B06A33">
+    <a class="card" href="House/" style="--accent-lt:#A3232E;--accent-dk:#EE7A6F">
       <span class="tile" aria-hidden="true">&#8962;</span>
       <h2>Around the House</h2>
       <p>Rooms, furniture and appliances — everyday words from home.</p>

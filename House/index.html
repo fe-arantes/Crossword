@@ -6,26 +6,31 @@
 <title>Around the House — Crossword Puzzle</title>
 <style>
   :root{
-    --bg1:#FBF3E6;
-    --bg2:#EFDFC7;
-    --paper:#FFFCF6;
-    --panel:rgba(255,252,246,.78);
-    --ink:#4A3A2C;
-    --ink-soft:#8C7660;
-    --line:#E0CDB0;
-    --line-soft:#EDDFC8;
-    --wood:#C1743A;
-    --wood-deep:#9E5A2A;
-    --sage:#7C9473;
-    --cell-bg:#FFFFFF;
-    --cell-border:#D8C4A6;
-    --hl:#FBEBD2;
-    --hl-active:#F5D9A8;
-    --ok:#4E8A5C;
-    --ok-bg:#E2F1E4;
-    --bad:#C25A4E;
-    --bad-bg:#FBE4E0;
-    --hint:#FFF0BC;
+    /* navy de fundo, branco no texto, vermelho escuro nas casas de papel */
+    --bg1:#0C1E38;
+    --bg2:#06111F;
+    --paper:#132844;
+    --panel:rgba(19,40,68,.82);
+    --hover:#1C3757;
+    --ink:#FFFFFF;
+    --ink-soft:#A7BCD8;
+    --line:#2A486B;
+    --line-soft:#1E3A5A;
+    /* --wood: vermelho claro, para o que fica SOBRE o navy
+       --wood-deep: vermelho escuro, só onde o fundo é claro (casas, selo) */
+    --wood:#EE7A6F;
+    --wood-deep:#8E1C26;
+    --sage:#6E9B84;
+    --cell-bg:#FBF7F0;
+    --cell-ink:#12253F;   /* letras: navy sobre o papel (--ink e branco) */
+    --cell-border:#8E1C26;
+    --hl:#F7DFD9;
+    --hl-active:#EFBEB3;
+    --ok:#1F7A4D;
+    --ok-bg:#DCF0E3;
+    --bad:#A4161A;
+    --bad-bg:#F6C9C4;
+    --hint:#FFE9A8;
     --cell:34px;
     --gap:3px;
     --serif:"Georgia","Iowan Old Style","Times New Roman",serif;
@@ -37,8 +42,8 @@
     min-height:100vh;color:var(--ink);font-family:var(--sans);
     padding:16px 12px 60px;
     background:
-      radial-gradient(900px 500px at 78% -5%, rgba(255,226,170,.55) 0%, transparent 62%),
-      radial-gradient(700px 460px at 8% 100%, rgba(193,116,58,.14) 0%, transparent 66%),
+      radial-gradient(900px 500px at 78% -5%, rgba(56,104,168,.35) 0%, transparent 62%),
+      radial-gradient(700px 460px at 8% 100%, rgba(142,28,38,.22) 0%, transparent 66%),
       linear-gradient(180deg, var(--bg1) 0%, var(--bg2) 100%);
     background-attachment:fixed;
   }
@@ -50,7 +55,7 @@
     border:1px solid var(--line);
     border-radius:16px;
     backdrop-filter:blur(7px);-webkit-backdrop-filter:blur(7px);
-    box-shadow:0 6px 24px rgba(120,86,50,.13), inset 0 1px 0 rgba(255,255,255,.7);
+    box-shadow:0 6px 24px rgba(0,0,0,.38), inset 0 1px 0 rgba(255,255,255,.06);
   }
 
   /* ---------- Cabeçalho ---------- */
@@ -63,7 +68,7 @@
     margin-top:8px;line-height:1.1;color:var(--ink);
   }
   .tagline{
-    font-family:var(--serif);font-style:italic;color:var(--wood-deep);
+    font-family:var(--serif);font-style:italic;color:var(--wood);
     margin-top:10px;font-size:clamp(.85rem,2.6vw,1rem);
   }
   .meta{
@@ -80,17 +85,17 @@
     border:1px solid var(--line);background:var(--paper);color:var(--ink);
     transition:transform .06s,background .2s,border-color .2s;
   }
-  .btn:hover{background:var(--hl);border-color:var(--wood)}
+  .btn:hover{background:var(--hover);border-color:var(--wood)}
   .btn:active{transform:scale(.97)}
   .btn:focus-visible{outline:2px solid var(--wood);outline-offset:2px}
-  .btn.primary{background:var(--wood);color:#FFF8EE;border-color:var(--wood);font-weight:700}
-  .btn.primary:hover{background:var(--wood-deep)}
-  .btn.danger{color:var(--bad);border-color:#E8B6AE}
+  .btn.primary{background:var(--wood-deep);color:#FFFFFF;border-color:var(--wood-deep);font-weight:700}
+  .btn.primary:hover{background:#AE2634}
+  .btn.danger{color:#F08A7E;border-color:#5E2730}
   #status{
     min-height:1.5em;margin:12px 2px;text-align:center;
     font-family:var(--serif);font-style:italic;font-size:.95rem;color:var(--ink-soft);
   }
-  #status strong{color:var(--wood-deep);font-style:normal}
+  #status strong{color:var(--wood);font-style:normal}
 
   /* ---------- Painéis laterais ---------- */
   .board-row{display:flex;gap:14px;align-items:flex-start;min-width:0}
@@ -102,17 +107,17 @@
   }
   .side-panel.active{
     border-color:var(--wood);
-    box-shadow:0 8px 26px rgba(120,86,50,.2), 0 0 0 1px rgba(193,116,58,.3), inset 0 1px 0 rgba(255,255,255,.7);
+    box-shadow:0 8px 26px rgba(0,0,0,.45), 0 0 0 1px rgba(238,122,111,.35), inset 0 1px 0 rgba(255,255,255,.06);
   }
   .side-panel.empty{opacity:.45}
   .side-panel:not(.empty){cursor:pointer}
   .sp-head{
     font-family:var(--serif);font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;
-    color:var(--wood-deep);padding-bottom:8px;margin-bottom:10px;border-bottom:1px solid var(--line-soft);
+    color:var(--wood);padding-bottom:8px;margin-bottom:10px;border-bottom:1px solid var(--line-soft);
   }
   .sp-fig{height:132px;display:flex;align-items:center;justify-content:center;position:relative}
   .sp-fig svg{width:auto;height:100%;max-width:100%}
-  .sp-fig .fig{filter:grayscale(1) brightness(1.12) opacity(.26);transition:filter .5s}
+  .sp-fig .fig{filter:grayscale(1) brightness(1.7) opacity(.2);transition:filter .5s}
   .side-panel.solved .sp-fig .fig{filter:none;animation:reveal .55s ease-out}
   @keyframes reveal{0%{transform:scale(.86);opacity:.4}60%{transform:scale(1.06)}100%{transform:scale(1);opacity:1}}
   .sp-fig .ph{font-size:2rem;opacity:.3}
@@ -133,34 +138,34 @@
     -webkit-overflow-scrolling:touch;scrollbar-width:thin;overscroll-behavior-x:contain;
   }
   #grid{
-    display:grid;grid-template-columns:repeat(15,var(--cell));
+    display:grid;grid-template-columns:repeat(12,var(--cell));
     grid-auto-rows:var(--cell);gap:var(--gap);width:max-content;margin:0 auto;
   }
   .cell{position:relative}
   .cell input{
     width:100%;height:100%;
     border:1px solid var(--cell-border);border-radius:6px;
-    background:var(--cell-bg);color:var(--ink);text-align:center;
+    background:var(--cell-bg);color:var(--cell-ink);text-align:center;
     font-family:var(--serif);font-size:max(16px,calc(var(--cell)*.52));
-    font-weight:700;text-transform:uppercase;caret-color:var(--wood);padding:0;
+    font-weight:700;text-transform:uppercase;caret-color:var(--wood-deep);padding:0;
     scroll-margin:10px;
-    box-shadow:inset 0 -2px 3px rgba(193,116,58,.08), 0 1px 2px rgba(120,86,50,.12);
+    box-shadow:inset 0 -2px 3px rgba(142,28,38,.09), 0 1px 2px rgba(0,0,0,.3);
     transition:background .15s,border-color .15s,box-shadow .15s;
   }
   .cell input:focus{outline:none}
   .cell .num{
     position:absolute;top:1px;left:3px;
     font-size:max(8px,calc(var(--cell)*.27));font-weight:700;
-    color:var(--wood);pointer-events:none;line-height:1;
+    color:var(--wood-deep);pointer-events:none;line-height:1;
   }
   .cell.word input{background:var(--hl)}
   .cell.active input{
-    background:var(--hl-active);border-color:var(--wood);
-    box-shadow:0 0 0 2px rgba(193,116,58,.35), 0 2px 6px rgba(120,86,50,.2);
+    background:var(--hl-active);border-color:var(--wood-deep);
+    box-shadow:0 0 0 2px rgba(142,28,38,.4), 0 2px 6px rgba(0,0,0,.3);
   }
   .cell.ok input{background:var(--ok-bg);border-color:var(--ok);color:var(--ok)}
   .cell.bad input{background:var(--bad-bg);border-color:var(--bad);color:var(--bad)}
-  .cell.hinted input{background:var(--hint);border-color:#E0BE63}
+  .cell.hinted input{background:var(--hint);border-color:#B8860B}
 
   /* ---------- Selo final ---------- */
   #stamp{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;opacity:0}
@@ -172,15 +177,15 @@
     font-weight:700;text-align:center;line-height:1.4;
     text-transform:uppercase;letter-spacing:.08em;
     transform:rotate(-5deg);
-    background:linear-gradient(160deg,#FFFDF8,#F7E3C4);
-    box-shadow:0 8px 28px rgba(120,86,50,.35);
+    background:linear-gradient(160deg,#FFFDF8,#F2DED9);
+    box-shadow:0 8px 28px rgba(0,0,0,.55);
   }
   #stamp.show .seal{animation:stampIn .5s cubic-bezier(.2,1.5,.4,1)}
   @keyframes stampIn{0%{transform:rotate(-5deg) scale(1.9);opacity:0}100%{transform:rotate(-5deg) scale(1);opacity:1}}
 
   /* ---------- Modal ---------- */
   #modalOverlay{
-    position:fixed;inset:0;z-index:60;background:rgba(60,42,26,.5);
+    position:fixed;inset:0;z-index:60;background:rgba(3,9,18,.68);
     display:none;align-items:center;justify-content:center;padding:20px;
     backdrop-filter:blur(3px);-webkit-backdrop-filter:blur(3px);
   }
@@ -188,7 +193,7 @@
   .modal{
     background:var(--paper);border:1px solid var(--line);border-top:3px solid var(--wood);
     border-radius:16px;padding:24px 22px 18px;max-width:360px;width:100%;
-    box-shadow:0 16px 46px rgba(60,42,26,.4);animation:modalIn .18s ease-out;
+    box-shadow:0 16px 46px rgba(0,0,0,.6);animation:modalIn .18s ease-out;
   }
   @keyframes modalIn{from{transform:scale(.93);opacity:0}to{transform:scale(1);opacity:1}}
   .modal p{font-family:var(--serif);font-size:1.05rem;line-height:1.5;margin-bottom:18px}
@@ -199,21 +204,21 @@
     display:none;align-items:center;gap:9px;
     position:sticky;top:6px;z-index:30;
     margin:0 0 10px;padding:8px 9px;border-radius:14px;
-    background:rgba(255,252,246,.95);
+    background:rgba(19,40,68,.95);
     backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);
     border:1px solid var(--line);
-    box-shadow:0 5px 18px rgba(120,86,50,.18);
+    box-shadow:0 5px 18px rgba(0,0,0,.5);
   }
   .cb-fig{flex:0 0 36px;height:46px;display:flex;align-items:center;justify-content:center}
   .cb-fig svg{height:100%;width:auto}
-  .cb-fig .fig{filter:grayscale(1) brightness(1.12) opacity(.28);transition:filter .5s}
+  .cb-fig .fig{filter:grayscale(1) brightness(1.7) opacity(.22);transition:filter .5s}
   #clueBar.solved .cb-fig .fig{filter:none}
   .cb-body{flex:1 1 auto;min-width:0}
   .cb-top{display:flex;align-items:center;gap:6px}
   .cb-dir{
     font-family:inherit;font-size:.58rem;font-weight:700;
     letter-spacing:.14em;text-transform:uppercase;
-    color:var(--wood-deep);background:rgba(193,116,58,.15);
+    color:var(--wood);background:rgba(238,122,111,.18);
     border:0;border-radius:999px;padding:3px 9px;cursor:pointer;
   }
   .cb-num{font-family:var(--serif);font-weight:700;font-size:.95rem;color:var(--wood)}
@@ -225,10 +230,10 @@
   .cb-nav{
     flex:0 0 34px;height:34px;padding:0;
     border:1px solid var(--line);border-radius:50%;
-    background:var(--paper);color:var(--wood-deep);
+    background:var(--paper);color:var(--wood);
     font-size:1.15rem;line-height:1;cursor:pointer;
   }
-  .cb-nav:active{background:var(--hl)}
+  .cb-nav:active{background:var(--hover)}
 
   footer{margin-top:26px;text-align:center;font-family:var(--serif);font-style:italic;font-size:.85rem;color:var(--ink-soft)}
 
@@ -246,7 +251,7 @@
     .sp-clue{display:inline;font-size:.82rem;margin:0}
     .sp-len{display:inline;margin-left:6px}
     .toolbar{position:sticky;top:0;z-index:5;padding:8px;border-radius:12px;
-      background:rgba(251,243,230,.9);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+      background:rgba(6,17,31,.92);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
   }
   /* ---------- Celular: painéis dão lugar à barra de pista ---------- */
   @media (max-width:760px){
@@ -278,12 +283,12 @@
     <p class="tagline">“Six rooms, six things — find your way home.”</p>
     <div class="meta">
       <span>12 clues</span>
-      <span>68 letters</span>
-      <span id="progress">0 / 68 filled</span>
+      <span>69 letters</span>
+      <span id="progress">0 / 69 filled</span>
     </div>
     <svg class="roofline" viewBox="0 0 1200 34" preserveAspectRatio="none" aria-hidden="true">
       <path d="M0 34 L0 20 L90 20 L150 6 L210 20 L330 20 L390 6 L450 20 L570 20 L630 6 L690 20 L810 20 L870 6 L930 20 L1050 20 L1110 6 L1170 20 L1200 20 L1200 34 Z"
-            fill="rgba(193,116,58,.28)"/>
+            fill="rgba(238,122,111,.22)"/>
     </svg>
   </header>
 
@@ -390,7 +395,7 @@
       for (var i = 0; i < motes.length; i++){
         var m = motes[i];
         ctx.globalAlpha = m.op;
-        ctx.fillStyle = "#C79A52";
+        ctx.fillStyle = "#9FC0E8";
         ctx.beginPath();
         ctx.arc(m.x + Math.sin(m.ph) * m.sway * 7, m.y, m.r, 0, Math.PI * 2);
         ctx.fill();
@@ -421,137 +426,137 @@
 
   var ART = {
     KITCHEN: fig(
-      '<path d="M18 40 Q18 34 24 34 L40 34 Q46 34 46 40 L44 66 Q43 72 37 72 L27 72 Q21 72 20 66 Z" fill="#8C98A4"/>'
-      + '<path d="M18 40 Q18 34 24 34 L40 34 Q46 34 46 40 L45 45 L19 45 Z" fill="#AEB9C4"/>'
-      + '<rect x="44" y="46" width="14" height="4.4" rx="2.2" fill="#6E7A86"/>'
-      + '<ellipse cx="32" cy="72" rx="13" ry="3" fill="#6E7A86"/>'
-      + '<path d="M24 28 Q20 22 24 16 M32 28 Q28 20 32 13 M40 28 Q36 22 40 16" stroke="#C9D3DB" stroke-width="2.6" fill="none" stroke-linecap="round" opacity=".85"/>'
-      + '<rect x="9" y="52" width="3" height="26" rx="1.5" fill="#B0763F"/>'
-      + '<ellipse cx="10.5" cy="50" rx="5" ry="6" fill="#D9A86B"/>'),
+      '<path d="M18 40 Q18 34 24 34 L40 34 Q46 34 46 40 L44 66 Q43 72 37 72 L27 72 Q21 72 20 66 Z" fill="#7E92AB"/>'
+      + '<path d="M18 40 Q18 34 24 34 L40 34 Q46 34 46 40 L45 45 L19 45 Z" fill="#A8BACE"/>'
+      + '<rect x="44" y="46" width="14" height="4.4" rx="2.2" fill="#56708F"/>'
+      + '<ellipse cx="32" cy="72" rx="13" ry="3" fill="#56708F"/>'
+      + '<path d="M24 28 Q20 22 24 16 M32 28 Q28 20 32 13 M40 28 Q36 22 40 16" stroke="#C3D2E0" stroke-width="2.6" fill="none" stroke-linecap="round" opacity=".85"/>'
+      + '<rect x="9" y="52" width="3" height="26" rx="1.5" fill="#A6443A"/>'
+      + '<ellipse cx="10.5" cy="50" rx="5" ry="6" fill="#D08A68"/>'),
 
     BATHROOM: fig(
-      '<path d="M12 46 L52 46 L49 70 Q48 76 42 76 L22 76 Q16 76 15 70 Z" fill="#E8F0F4" stroke="#A9BCC6" stroke-width="1.6"/>'
-      + '<path d="M15 54 L49 54 L47.5 66 L16.5 66 Z" fill="#9FD3E8" opacity=".75"/>'
-      + '<rect x="18" y="76" width="4" height="7" rx="1.6" fill="#9AA8B2"/><rect x="42" y="76" width="4" height="7" rx="1.6" fill="#9AA8B2"/>'
-      + '<path d="M44 46 L44 30 Q44 22 36 22" stroke="#9AA8B2" stroke-width="3.4" fill="none" stroke-linecap="round"/>'
-      + '<circle cx="34" cy="22" r="5.5" fill="#B8C6D0"/>'
-      + '<path d="M31 29 L30 36 M34 29 L34 37 M37 29 L38 36" stroke="#9FD3E8" stroke-width="1.8" stroke-linecap="round"/>'
+      '<path d="M12 46 L52 46 L49 70 Q48 76 42 76 L22 76 Q16 76 15 70 Z" fill="#E7F0F7" stroke="#A3B8CE" stroke-width="1.6"/>'
+      + '<path d="M15 54 L49 54 L47.5 66 L16.5 66 Z" fill="#93CFE8" opacity=".75"/>'
+      + '<rect x="18" y="76" width="4" height="7" rx="1.6" fill="#93A7BE"/><rect x="42" y="76" width="4" height="7" rx="1.6" fill="#93A7BE"/>'
+      + '<path d="M44 46 L44 30 Q44 22 36 22" stroke="#93A7BE" stroke-width="3.4" fill="none" stroke-linecap="round"/>'
+      + '<circle cx="34" cy="22" r="5.5" fill="#B2C4D6"/>'
+      + '<path d="M31 29 L30 36 M34 29 L34 37 M37 29 L38 36" stroke="#93CFE8" stroke-width="1.8" stroke-linecap="round"/>'
       + '<circle cx="24" cy="60" r="3.4" fill="#FFFFFF" opacity=".85"/><circle cx="33" cy="57" r="2.4" fill="#FFFFFF" opacity=".8"/>'),
 
     BEDROOM: fig(
-      '<rect x="8" y="34" width="6" height="46" rx="2.6" fill="#9E6B3C"/>'
-      + '<rect x="50" y="48" width="6" height="32" rx="2.6" fill="#9E6B3C"/>'
-      + '<rect x="8" y="32" width="14" height="16" rx="4" fill="#B5793F"/>'
-      + '<rect x="11" y="56" width="42" height="18" rx="4" fill="#E3D6C2"/>'
-      + '<path d="M11 62 L53 62 L53 70 Q53 74 49 74 L15 74 Q11 74 11 70 Z" fill="#7C9473"/>'
-      + '<rect x="15" y="46" width="22" height="12" rx="5" fill="#FFFBF2" stroke="#D8C9B2" stroke-width="1.2"/>'
-      + '<rect x="12" y="74" width="4" height="7" rx="1.6" fill="#7A5330"/><rect x="48" y="74" width="4" height="7" rx="1.6" fill="#7A5330"/>'),
+      '<rect x="8" y="34" width="6" height="46" rx="2.6" fill="#8E3A33"/>'
+      + '<rect x="50" y="48" width="6" height="32" rx="2.6" fill="#8E3A33"/>'
+      + '<rect x="8" y="32" width="14" height="16" rx="4" fill="#A6443A"/>'
+      + '<rect x="11" y="56" width="42" height="18" rx="4" fill="#E1D3BB"/>'
+      + '<path d="M11 62 L53 62 L53 70 Q53 74 49 74 L15 74 Q11 74 11 70 Z" fill="#6E9B84"/>'
+      + '<rect x="15" y="46" width="22" height="12" rx="5" fill="#FCF6E9" stroke="#D4C4A8" stroke-width="1.2"/>'
+      + '<rect x="12" y="74" width="4" height="7" rx="1.6" fill="#5E2422"/><rect x="48" y="74" width="4" height="7" rx="1.6" fill="#5E2422"/>'),
 
     GARAGE: fig(
-      '<path d="M6 40 L32 20 L58 40 L58 44 L6 44 Z" fill="#B5793F"/>'
-      + '<rect x="10" y="44" width="44" height="36" fill="#E5D7C0"/>'
-      + '<rect x="15" y="50" width="34" height="30" rx="2" fill="#9FB0BC"/>'
-      + '<path d="M15 56 H49 M15 62 H49 M15 68 H49 M15 74 H49" stroke="#7E8F9B" stroke-width="2"/>'
-      + '<rect x="27" y="76" width="10" height="2.6" rx="1.3" fill="#5F6E78"/>'
-      + '<rect x="6" y="80" width="52" height="4" rx="2" fill="#8C7660"/>'),
+      '<path d="M6 40 L32 20 L58 40 L58 44 L6 44 Z" fill="#A6443A"/>'
+      + '<rect x="10" y="44" width="44" height="36" fill="#E3D5BA"/>'
+      + '<rect x="15" y="50" width="34" height="30" rx="2" fill="#97ACC4"/>'
+      + '<path d="M15 56 H49 M15 62 H49 M15 68 H49 M15 74 H49" stroke="#6F88A4" stroke-width="2"/>'
+      + '<rect x="27" y="76" width="10" height="2.6" rx="1.3" fill="#4E6480"/>'
+      + '<rect x="6" y="80" width="52" height="4" rx="2" fill="#6E5A52"/>'),
 
     BALCONY: fig(
-      '<rect x="8" y="42" width="48" height="4" rx="2" fill="#B5793F"/>'
-      + '<rect x="8" y="74" width="48" height="5" rx="2" fill="#9E6B3C"/>'
-      + '<path d="M13 46 V74 M21 46 V74 M29 46 V74 M37 46 V74 M45 46 V74 M52 46 V74" stroke="#A8846A" stroke-width="3" stroke-linecap="round"/>'
-      + '<path d="M34 42 Q34 26 44 22 Q40 32 40 42 Z" fill="#7C9473"/>'
-      + '<path d="M34 42 Q34 30 24 26 Q30 34 30 42 Z" fill="#8FA97F"/>'
-      + '<path d="M28 42 L40 42 L38 56 L30 56 Z" fill="#C1743A"/>'
-      + '<circle cx="18" cy="30" r="6" fill="#F3D48A" opacity=".75"/>'),
+      '<rect x="8" y="42" width="48" height="4" rx="2" fill="#A6443A"/>'
+      + '<rect x="8" y="74" width="48" height="5" rx="2" fill="#8E3A33"/>'
+      + '<path d="M13 46 V74 M21 46 V74 M29 46 V74 M37 46 V74 M45 46 V74 M52 46 V74" stroke="#9C5A4C" stroke-width="3" stroke-linecap="round"/>'
+      + '<path d="M34 42 Q34 26 44 22 Q40 32 40 42 Z" fill="#6E9B84"/>'
+      + '<path d="M34 42 Q34 30 24 26 Q30 34 30 42 Z" fill="#82AE96"/>'
+      + '<path d="M28 42 L40 42 L38 56 L30 56 Z" fill="#B04A3E"/>'
+      + '<circle cx="18" cy="30" r="6" fill="#F0CE80" opacity=".75"/>'),
 
     HALLWAY: fig(
-      '<path d="M4 16 L60 16 L60 84 L4 84 Z" fill="#F0E4CE"/>'
-      + '<path d="M18 30 L46 30 L46 76 L18 76 Z" fill="#DCC9A8"/>'
-      + '<path d="M26 38 L38 38 L38 70 L26 70 Z" fill="#B5793F"/>'
-      + '<circle cx="35" cy="55" r="1.8" fill="#E8C45A"/>'
-      + '<path d="M4 84 L18 76 L46 76 L60 84 Z" fill="#C9AF8A"/>'
-      + '<path d="M22 84 L28 76 L36 76 L42 84 Z" fill="#9E6B3C" opacity=".75"/>'
-      + '<rect x="7" y="34" width="6" height="14" rx="2" fill="#9AA8B2"/>'
-      + '<rect x="51" y="34" width="6" height="14" rx="2" fill="#9AA8B2"/>'),
+      '<path d="M4 16 L60 16 L60 84 L4 84 Z" fill="#EFE2C8"/>'
+      + '<path d="M18 30 L46 30 L46 76 L18 76 Z" fill="#D9C5A0"/>'
+      + '<path d="M26 38 L38 38 L38 70 L26 70 Z" fill="#A6443A"/>'
+      + '<circle cx="35" cy="55" r="1.8" fill="#E5BD50"/>'
+      + '<path d="M4 84 L18 76 L46 76 L60 84 Z" fill="#C4A87E"/>'
+      + '<path d="M22 84 L28 76 L36 76 L42 84 Z" fill="#8E3A33" opacity=".75"/>'
+      + '<rect x="7" y="34" width="6" height="14" rx="2" fill="#93A7BE"/>'
+      + '<rect x="51" y="34" width="6" height="14" rx="2" fill="#93A7BE"/>'),
 
     WARDROBE: fig(
-      '<rect x="12" y="14" width="40" height="66" rx="3" fill="#B5793F"/>'
-      + '<rect x="15" y="17" width="16.5" height="60" rx="2" fill="#CE8D50"/>'
-      + '<rect x="32.5" y="17" width="16.5" height="60" rx="2" fill="#CE8D50"/>'
-      + '<rect x="21" y="26" width="5" height="12" rx="2.5" fill="#F0E0C4" opacity=".55"/>'
-      + '<circle cx="29.5" cy="47" r="2.2" fill="#F0CE63"/><circle cx="34.5" cy="47" r="2.2" fill="#F0CE63"/>'
-      + '<rect x="12" y="10" width="40" height="5" rx="2.4" fill="#9E6B3C"/>'
-      + '<rect x="15" y="80" width="5" height="6" rx="2" fill="#7A5330"/>'
-      + '<rect x="44" y="80" width="5" height="6" rx="2" fill="#7A5330"/>'),
+      '<rect x="12" y="14" width="40" height="66" rx="3" fill="#A6443A"/>'
+      + '<rect x="15" y="17" width="16.5" height="60" rx="2" fill="#C15C4A"/>'
+      + '<rect x="32.5" y="17" width="16.5" height="60" rx="2" fill="#C15C4A"/>'
+      + '<rect x="21" y="26" width="5" height="12" rx="2.5" fill="#EEDDBC" opacity=".55"/>'
+      + '<circle cx="29.5" cy="47" r="2.2" fill="#EDC75A"/><circle cx="34.5" cy="47" r="2.2" fill="#EDC75A"/>'
+      + '<rect x="12" y="10" width="40" height="5" rx="2.4" fill="#8E3A33"/>'
+      + '<rect x="15" y="80" width="5" height="6" rx="2" fill="#5E2422"/>'
+      + '<rect x="44" y="80" width="5" height="6" rx="2" fill="#5E2422"/>'),
 
     MIRROR: fig(
-      '<ellipse cx="32" cy="44" rx="22" ry="30" fill="#C1743A"/>'
-      + '<ellipse cx="32" cy="44" rx="17.5" ry="25.5" fill="#DCEAF0"/>'
+      '<ellipse cx="32" cy="44" rx="22" ry="30" fill="#B04A3E"/>'
+      + '<ellipse cx="32" cy="44" rx="17.5" ry="25.5" fill="#DBEAF4"/>'
       + '<path d="M22 26 L38 62 M30 24 L42 50" stroke="#FFFFFF" stroke-width="3.4" stroke-linecap="round" opacity=".7"/>'
-      + '<ellipse cx="32" cy="44" rx="17.5" ry="25.5" fill="none" stroke="#A9BCC6" stroke-width="1.2"/>'
-      + '<rect x="28" y="73" width="8" height="10" rx="2" fill="#9E6B3C"/>'
-      + '<ellipse cx="32" cy="85" rx="13" ry="4" fill="#B5793F"/>'),
+      + '<ellipse cx="32" cy="44" rx="17.5" ry="25.5" fill="none" stroke="#A3B8CE" stroke-width="1.2"/>'
+      + '<rect x="28" y="73" width="8" height="10" rx="2" fill="#8E3A33"/>'
+      + '<ellipse cx="32" cy="85" rx="13" ry="4" fill="#A6443A"/>'),
 
     FRIDGE: fig(
-      '<rect x="16" y="10" width="32" height="74" rx="5" fill="#DDE4E8"/>'
-      + '<rect x="16" y="10" width="32" height="26" rx="5" fill="#E9EFF2"/>'
-      + '<path d="M16 36 H48" stroke="#B9C4CB" stroke-width="2"/>'
-      + '<rect x="41" y="18" width="3.4" height="13" rx="1.7" fill="#9AA8B2"/>'
-      + '<rect x="41" y="42" width="3.4" height="18" rx="1.7" fill="#9AA8B2"/>'
-      + '<rect x="21" y="16" width="8" height="5" rx="1.6" fill="#F3D48A"/>'
-      + '<rect x="21" y="45" width="6" height="6" rx="1.6" fill="#C25A4E"/>'
-      + '<rect x="30" y="45" width="6" height="6" rx="1.6" fill="#7C9473"/>'
-      + '<rect x="18" y="84" width="5" height="4" rx="1.6" fill="#8C98A4"/>'
-      + '<rect x="41" y="84" width="5" height="4" rx="1.6" fill="#8C98A4"/>'),
+      '<rect x="16" y="10" width="32" height="74" rx="5" fill="#DCE5EE"/>'
+      + '<rect x="16" y="10" width="32" height="26" rx="5" fill="#E8EFF6"/>'
+      + '<path d="M16 36 H48" stroke="#B3C3D3" stroke-width="2"/>'
+      + '<rect x="41" y="18" width="3.4" height="13" rx="1.7" fill="#93A7BE"/>'
+      + '<rect x="41" y="42" width="3.4" height="18" rx="1.7" fill="#93A7BE"/>'
+      + '<rect x="21" y="16" width="8" height="5" rx="1.6" fill="#F0CE80"/>'
+      + '<rect x="21" y="45" width="6" height="6" rx="1.6" fill="#C4463F"/>'
+      + '<rect x="30" y="45" width="6" height="6" rx="1.6" fill="#6E9B84"/>'
+      + '<rect x="18" y="84" width="5" height="4" rx="1.6" fill="#7E92AB"/>'
+      + '<rect x="41" y="84" width="5" height="4" rx="1.6" fill="#7E92AB"/>'),
 
     CURTAIN: fig(
-      '<rect x="12" y="20" width="40" height="52" rx="3" fill="#BFE0EE"/>'
+      '<rect x="12" y="20" width="40" height="52" rx="3" fill="#B5DDEF"/>'
       + '<path d="M32 20 V72 M12 46 H52" stroke="#FFFFFF" stroke-width="2.6"/>'
-      + '<rect x="8" y="14" width="48" height="4.4" rx="2.2" fill="#9E6B3C"/>'
-      + '<circle cx="9" cy="16" r="3.2" fill="#B5793F"/><circle cx="55" cy="16" r="3.2" fill="#B5793F"/>'
-      + '<path d="M12 18 Q20 40 14 72 L26 72 Q22 42 26 18 Z" fill="#C1743A"/>'
-      + '<path d="M52 18 Q44 40 50 72 L38 72 Q42 42 38 18 Z" fill="#C1743A"/>'
-      + '<path d="M18 22 Q16 46 17 68 M46 22 Q48 46 47 68" stroke="#9E5A2A" stroke-width="1.6" fill="none" opacity=".7"/>'
-      + '<rect x="10" y="72" width="44" height="4" rx="2" fill="#9E6B3C"/>'),
+      + '<rect x="8" y="14" width="48" height="4.4" rx="2.2" fill="#8E3A33"/>'
+      + '<circle cx="9" cy="16" r="3.2" fill="#A6443A"/><circle cx="55" cy="16" r="3.2" fill="#A6443A"/>'
+      + '<path d="M12 18 Q20 40 14 72 L26 72 Q22 42 26 18 Z" fill="#B04A3E"/>'
+      + '<path d="M52 18 Q44 40 50 72 L38 72 Q42 42 38 18 Z" fill="#B04A3E"/>'
+      + '<path d="M18 22 Q16 46 17 68 M46 22 Q48 46 47 68" stroke="#7E2622" stroke-width="1.6" fill="none" opacity=".7"/>'
+      + '<rect x="10" y="72" width="44" height="4" rx="2" fill="#8E3A33"/>'),
 
     PILLOW: fig(
-      '<path d="M10 36 Q8 30 16 28 L48 28 Q56 30 54 36 L55 62 Q56 68 48 70 L16 70 Q8 68 9 62 Z" fill="#FFFBF2" stroke="#D8C9B2" stroke-width="1.6"/>'
-      + '<path d="M16 34 Q32 40 48 34" stroke="#E6DAC4" stroke-width="2" fill="none"/>'
-      + '<path d="M16 64 Q32 58 48 64" stroke="#E6DAC4" stroke-width="2" fill="none"/>'
-      + '<path d="M20 44 Q26 48 22 54" stroke="#E6DAC4" stroke-width="1.8" fill="none" stroke-linecap="round"/>'
-      + '<circle cx="38" cy="49" r="7" fill="#F3D48A" opacity=".45"/>'),
+      '<path d="M10 36 Q8 30 16 28 L48 28 Q56 30 54 36 L55 62 Q56 68 48 70 L16 70 Q8 68 9 62 Z" fill="#FCF6E9" stroke="#D4C4A8" stroke-width="1.6"/>'
+      + '<path d="M16 34 Q32 40 48 34" stroke="#E4D7BE" stroke-width="2" fill="none"/>'
+      + '<path d="M16 64 Q32 58 48 64" stroke="#E4D7BE" stroke-width="2" fill="none"/>'
+      + '<path d="M20 44 Q26 48 22 54" stroke="#E4D7BE" stroke-width="1.8" fill="none" stroke-linecap="round"/>'
+      + '<circle cx="38" cy="49" r="7" fill="#F0CE80" opacity=".45"/>'),
 
     STOVE: fig(
-      '<rect x="10" y="30" width="44" height="52" rx="4" fill="#C6CFD6"/>'
-      + '<rect x="10" y="30" width="44" height="10" rx="4" fill="#98A5AF"/>'
-      + '<circle cx="21" cy="35" r="2.4" fill="#4A3A2C"/><circle cx="30" cy="35" r="2.4" fill="#4A3A2C"/>'
-      + '<circle cx="39" cy="35" r="2.4" fill="#4A3A2C"/><circle cx="48" cy="35" r="2.4" fill="#C25A4E"/>'
-      + '<rect x="15" y="46" width="34" height="30" rx="3" fill="#5C666E"/>'
-      + '<rect x="19" y="50" width="26" height="22" rx="2" fill="#F3D48A" opacity=".55"/>'
-      + '<rect x="15" y="42" width="34" height="3.4" rx="1.7" fill="#8C98A4"/>'
-      + '<path d="M10 24 L54 24" stroke="#98A5AF" stroke-width="3.4" stroke-linecap="round"/>'
-      + '<circle cx="22" cy="18" r="5" fill="#E0A65A"/><circle cx="42" cy="18" r="5" fill="#E0A65A"/>'
-      + '<circle cx="22" cy="18" r="2" fill="#B5793F"/><circle cx="42" cy="18" r="2" fill="#B5793F"/>')
+      '<rect x="10" y="30" width="44" height="52" rx="4" fill="#C0CEDC"/>'
+      + '<rect x="10" y="30" width="44" height="10" rx="4" fill="#8A9DB6"/>'
+      + '<circle cx="21" cy="35" r="2.4" fill="#2A1A20"/><circle cx="30" cy="35" r="2.4" fill="#2A1A20"/>'
+      + '<circle cx="39" cy="35" r="2.4" fill="#2A1A20"/><circle cx="48" cy="35" r="2.4" fill="#C4463F"/>'
+      + '<rect x="15" y="46" width="34" height="30" rx="3" fill="#475F7B"/>'
+      + '<rect x="19" y="50" width="26" height="22" rx="2" fill="#F0CE80" opacity=".55"/>'
+      + '<rect x="15" y="42" width="34" height="3.4" rx="1.7" fill="#7E92AB"/>'
+      + '<path d="M10 24 L54 24" stroke="#8A9DB6" stroke-width="3.4" stroke-linecap="round"/>'
+      + '<circle cx="22" cy="18" r="5" fill="#DC9E4E"/><circle cx="42" cy="18" r="5" fill="#DC9E4E"/>'
+      + '<circle cx="22" cy="18" r="2" fill="#A6443A"/><circle cx="42" cy="18" r="2" fill="#A6443A"/>')
   };
 
   /* =========================================================
      3. PALAVRAS E GRADE (gerada e validada programaticamente)
      ========================================================= */
   var WORDS = [
-    {n:1,  w:"STOVE",    r:0, c:11, d:"D", clue:"The appliance with burners, where you cook your food.",  art:ART.STOVE},
-    {n:2,  w:"PILLOW",   r:2, c:0,  d:"D", clue:"You rest your head on it when you sleep.",              art:ART.PILLOW},
-    {n:3,  w:"MIRROR",   r:2, c:2,  d:"D", clue:"You look at your own reflection in it.",                art:ART.MIRROR},
-    {n:4,  w:"FRIDGE",   r:2, c:7,  d:"D", clue:"The appliance that keeps your food cold.",              art:ART.FRIDGE},
-    {n:5,  w:"BALCONY",  r:2, c:14, d:"D", clue:"A small platform outside a window, with a railing.",    art:ART.BALCONY},
-    {n:6,  w:"BATHROOM", r:3, c:4,  d:"D", clue:"The room with a toilet, a sink and a shower.",          art:ART.BATHROOM},
-    {n:7,  w:"KITCHEN",  r:4, c:6,  d:"A", clue:"The room where meals are prepared.",                    art:ART.KITCHEN},
-    {n:8,  w:"CURTAIN",  r:4, c:9,  d:"D", clue:"The cloth you close to cover a window.",                art:ART.CURTAIN},
-    {n:9,  w:"GARAGE",   r:6, c:7,  d:"A", clue:"The place where you park the car.",                     art:ART.GARAGE},
-    {n:10, w:"WARDROBE", r:7, c:0,  d:"A", clue:"The tall piece of furniture where you hang clothes.",   art:ART.WARDROBE},
-    {n:11, w:"HALLWAY",  r:8, c:8,  d:"A", clue:"The narrow passage that connects the rooms.",           art:ART.HALLWAY},
-    {n:12, w:"BEDROOM",  r:9, c:0,  d:"A", clue:"The room where you sleep.",                             art:ART.BEDROOM}
+    {n:1,  w:"KITCHEN",  r:0,  c:0,  d:"A", clue:"The room where meals are prepared.", art:ART.KITCHEN},
+    {n:2,  w:"CURTAIN",  r:0,  c:3,  d:"D", clue:"The cloth you close to cover a window.", art:ART.CURTAIN},
+    {n:3,  w:"HALLWAY",  r:1,  c:11, d:"D", clue:"The narrow passage that connects the rooms.", art:ART.HALLWAY},
+    {n:4,  w:"FRIDGE",   r:2,  c:2,  d:"A", clue:"The appliance that keeps your food cold.", art:ART.FRIDGE},
+    {n:5,  w:"WARDROBE", r:3,  c:1,  d:"D", clue:"The tall piece of furniture where you hang clothes.", art:ART.WARDROBE},
+    {n:6,  w:"MIRROR",   r:3,  c:9,  d:"D", clue:"You look at your own reflection in it.", art:ART.MIRROR},
+    {n:7,  w:"GARAGE",   r:4,  c:0,  d:"A", clue:"The place where you park the car.", art:ART.GARAGE},
+    {n:8,  w:"PILLOW",   r:5,  c:7,  d:"D", clue:"You rest your head on it when you sleep.", art:ART.PILLOW},
+    {n:9,  w:"BALCONY",  r:7,  c:5,  d:"A", clue:"A small platform outside a window, with a railing.", art:ART.BALCONY},
+    {n:10, w:"STOVE",    r:8,  c:3,  d:"D", clue:"The appliance with burners, where you cook your food.", art:ART.STOVE},
+    {n:11, w:"BATHROOM", r:9,  c:1,  d:"A", clue:"The room with a toilet, a sink and a shower.", art:ART.BATHROOM},
+    {n:12, w:"BEDROOM",  r:12, c:2,  d:"A", clue:"The room where you sleep.", art:ART.BEDROOM}
   ];
-  var ROWS = 11, COLS = 15;
+  var ROWS = 13, COLS = 12;
 
   /* =========================================================
      4. MOTOR DA CRUZADINHA
